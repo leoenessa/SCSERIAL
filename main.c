@@ -3,6 +3,9 @@
 #include <string.h>
 #include <windows.h>
 
+#define SERIAL_LENGTH 20
+#define CHARSET "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+#define CHARSET_SIZE 36
 // Buffer global de 7 bytes
 uint8_t data_428cc8[] = { 0x02, 0x04, 0x05, 0x07, 0x0C, 0x01, 0x03 };
 
@@ -73,10 +76,10 @@ static const uint32_t data_42a9a8[322] = {
     0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D
 };
 
-//tabela de substituiÃ§Ã£o funÃ§Ã£o gera_mascara2
+//tabela de substituição função gera_mascara2
 const char tabela_base32[] = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
 
-// FunÃ§Ã£o de processamento
+// Função de processamento
 char* process_serial(uint8_t* buffer, const char* serial) {
     uint8_t i;
     const char* ecx = serial;
@@ -159,7 +162,7 @@ uint32_t gera_xor1(uint32_t valor_hash, uint32_t chave) {
 void gera_mascara1(uint8_t* buffer, uint32_t valor) {
     const char* tabela = "64382957JKLMNPQRSTUVWXYZABCDEFGH";
 
-    // Extrai os blocos de 5 bits e coloca nos Ã­ndices especificados
+    // Extrai os blocos de 5 bits e coloca nos índices especificados
     buffer[6] = valor & 0x1F;
     buffer[5] = (valor >> 5) & 0x1F;
     buffer[4] = (valor >> 10) & 0x1F;
@@ -171,7 +174,7 @@ void gera_mascara1(uint8_t* buffer, uint32_t valor) {
     // Combina bits: buffer[0] |= (buffer[6] & 0x07) << 2;
     buffer[0] |= (buffer[6] & 0x07) << 2;
 
-    // SubstituiÃ§Ã£o de cada valor pelos caracteres da tabela
+    // Substituição de cada valor pelos caracteres da tabela
     uint8_t temp0 = buffer[0];
     uint8_t temp1 = buffer[1];
     uint8_t temp2 = buffer[2];
@@ -190,15 +193,15 @@ void gera_mascara1(uint8_t* buffer, uint32_t valor) {
 
     buffer[7] = '\0'; // terminador de string
 }
-// FunÃ§Ã£o principal
+// Função principal
 void concatena1(char* destino, const char* buffer13, const char* mascara7) {
     // Copia os 13 primeiros caracteres do buffer processado
     memcpy(destino, buffer13, 13);
 
-    // Copia os 7 caracteres da mÃ¡scara
+    // Copia os 7 caracteres da máscara
     memcpy(destino + 13, mascara7, 7);
 
-    // Garante terminaÃ§Ã£o nula
+    // Garante terminação nula
     destino[20] = '\0';
 }
 
@@ -246,7 +249,7 @@ uint8_t* gera_mascara2(uint8_t* buffer, uint32_t valor_hash) {
     // Completa os 3 bits finais do byte 6 com os 3 bits inferiores de parte_final
     buffer[6] |= parte_final & 0x07;
 
-    // SubstituiÃ§Ã£o por caracteres da tabela base32
+    // Substituição por caracteres da tabela base32
     buffer[0] = tabela_base32[buffer[0]];
     buffer[1] = tabela_base32[buffer[1]];
     buffer[2] = tabela_base32[buffer[2]];
@@ -262,7 +265,7 @@ uint8_t* gera_mascara2(uint8_t* buffer, uint32_t valor_hash) {
 }
 
 void* process_serial2(char* arg1, const char* arg2) {
-    // Copia todo o conteÃºdo de arg2 para arg1 (inclusive o terminador nulo)
+    // Copia todo o conteúdo de arg2 para arg1 (inclusive o terminador nulo)
     strcpy(arg1, arg2);
 
     // Troca de bytes conforme a tabela data_428cc8
@@ -324,83 +327,108 @@ void* process_serial2(char* arg1, const char* arg2) {
     return arg1;
 }
 
-int main() {
-    //const char* input_serial = "ABCDEFGHIJ1234567890"; // 20 caracteres
-    const char* input_serial = "622A3TLBXQARPUKTM2RD"; // 20 caracteres
-    uint8_t buffer[32] = {0}; // buffer com espaÃ§o extra
-
-    LARGE_INTEGER frequency, inicio, fim;
-    QueryPerformanceFrequency(&frequency); // ObtÃ©m a frequÃªncia do contador
-    QueryPerformanceCounter(&inicio); // Marca o inÃ­cio
-
+uint32_t brute_force(char* serial){
 
     //PROCESSA SERIAL
-    process_serial(buffer, input_serial);
-
-    printf("[1]Buffer apos process_serial: ");
-    for (int i = 0; i < 21; i++) { // 20 + null terminator
-        printf("%c", buffer[i] ? buffer[i] : '.');
-    }
-    printf("\n");
+    uint8_t buffer[32] = {0};
+    process_serial(buffer, serial);
 
     //GERA HASH1
     uint32_t hash = gera_hash1(buffer, 13);
-    printf("[2]Hash gerado: %08X\n", hash);
 
     //GERA XOR1
     uint32_t xor1 = gera_xor1(hash, 0x1D530);
-
-    printf("[3]Valor apos XOR1: %08X\n", xor1);
-
 
     //GERA MASCARA1
     char codigo[8] = {0};
     gera_mascara1(codigo, xor1);
 
-    printf("[4]Valor mascara: %s\n", codigo);
-
     //CONCATENA SERIAL13 COM XOR
     char serial_mais_xor[21];
     concatena1(serial_mais_xor, buffer, codigo);
 
-    printf("[5]Serial concat xor:%s\n",serial_mais_xor);
-
-
     //GERA HASH2
     uint32_t resultado_hash2 = gera_hash2(serial_mais_xor, 0X14, 0X1D530);
-
-    printf("[6]Resultado gera hash2:%08X\n",resultado_hash2);
 
     //GERA MASCARA 2
     uint8_t buffer_mascara[8];  // 7 + null terminator
     gera_mascara2(buffer_mascara, resultado_hash2);
-    printf("[7]Pos gera mascara 2: %s\n", buffer_mascara);
 
     //CONCATENA
     char serial_mais_mascara[21];
     concatena1(serial_mais_mascara, buffer, buffer_mascara);
-    printf("[8]Serial_mod concat mascara2:%s\n",serial_mais_mascara);
 
     //MODIFICA SERIAL 2
-    char buffer_final[32];  // Deve ter espaÃ§o suficiente para o serial + mÃ¡scara + modificaÃ§Ãµes
+    char buffer_final[32];  // Deve ter espaço suficiente para o serial + máscara + modificações
     process_serial2(buffer_final, serial_mais_mascara);
-    printf("[9]Serial_final pos-processamento: %s\n\n\n", buffer_final);
 
-    // COMPARAÃ‡ÃƒO
-    printf("Serial de entrada:         %s\n", input_serial);
-    printf("Serial apÃ³s processamento: %s\n", buffer_final);
-
-    if (strncmp(input_serial, buffer_final, 16) == 0) {
+    if (strncmp(serial, buffer_final, 16) == 0) {
         printf("[OK] Serial VALIDO.\n");
+        printf("Serial de entrada:%s /Serial após processamento:%s  / ",serial, buffer_final);
+        return 1;
     } else {
         printf("[ERRO] Serial INVALIDO.\n");
+        return 0;
     }
+}
+
+void increment_serial(char *serial) {
+    int i = SERIAL_LENGTH - 1;
+
+    while (i >= 0) {
+        char *pos = strchr(CHARSET, serial[i]);
+        int index = pos ? (int)(pos - CHARSET) : -1;
+
+        if (index < 0) {
+            serial[i] = CHARSET[0];
+            i--;
+            continue;
+        }
+
+        if (index < CHARSET_SIZE - 1) {
+            serial[i] = CHARSET[index + 1];
+            return;
+        } else {
+            serial[i] = CHARSET[0];
+            i--;
+        }
+    }
+}
+
+int main() {
+
+    char serial[SERIAL_LENGTH + 1];
+    memset(serial, CHARSET[0], SERIAL_LENGTH);
+    serial[SERIAL_LENGTH] = '\0';
+
+    LARGE_INTEGER frequency, inicio, fim;
+    QueryPerformanceFrequency(&frequency); // Obtém a frequência do contador
+    QueryPerformanceCounter(&inicio); // Marca o início
+    uint32_t achou = 0;
+    char sair = {};
+
+    while(achou!=1) {
+        printf("%s ", serial);
+        brute_force(serial);
+        increment_serial(serial);
+        /*contador++;
+        if(contador>=100000){
+            printf("Prosseguir com o brute force?[s][n]");
+            scanf("%c",&sair);
+            if(sair=="s"){
+                break;
+            }else{
+                contador=0;
+            }
+        }*/
+    }
+
 
     QueryPerformanceCounter(&fim); // Marca o fim
     double tempo_execucao = (double)(fim.QuadPart - inicio.QuadPart) / frequency.QuadPart; // Tempo em segundos
 
 
-    printf("\nTempo de execuÃ§Ã£o: %f segundos\n", tempo_execucao);
+    printf("\nTempo de execução: %f segundos\n", tempo_execucao);
     getchar();
     return 0;
 }
