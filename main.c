@@ -1,0 +1,406 @@
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+#include <windows.h>
+
+// Buffer global de 7 bytes
+uint8_t data_428cc8[] = { 0x02, 0x04, 0x05, 0x07, 0x0C, 0x01, 0x03 };
+
+static const uint32_t data_42a9a8[322] = {
+    0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA,
+    0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3,
+    0x0EDB8832, 0x79DCB8A4, 0xE0D5E91E, 0x97D2D988,
+    0x09B64C2B, 0x7EB17CBD, 0xE7B82D07, 0x90BF1D91,
+    0x1DB71064, 0x6AB020F2, 0xF3B97148, 0x84BE41DE,
+    0x1ADAD47D, 0x6DDDE4EB, 0xF4D4B551, 0x83D385C7,
+    0x136C9856, 0x646BA8C0, 0xFD62F97A, 0x8A65C9EC,
+    0x14015C4F, 0x63066CD9, 0xFA0F3D63, 0x8D080DF5,
+    0x3B6E20C8, 0x4C69105E, 0xD56041E4, 0xA2677172,
+    0x3C03E4D1, 0x4B04D447, 0xD20D85FD, 0xA50AB56B,
+    0x35B5A8FA, 0x42B2986C, 0xDBBBC9D6, 0xACBCF940,
+    0x32D86CE3, 0x45DF5C75, 0xDCD60DCF, 0xABD13D59,
+    0x26D930AC, 0x51DE003A, 0xC8D75180, 0xBFD06116,
+    0x21B4F4B5, 0x56B3C423, 0xCFBA9599, 0xB8BDA50F,
+    0x2802B89E, 0x5F058808, 0xC60CD9B2, 0xB10BE924,
+    0x2F6F7C87, 0x58684C11, 0xC1611DAB, 0xB6662D3D,
+    0x76DC4190, 0x01DB7106, 0x98D220BC, 0xEFD5102A,
+    0x71B18589, 0x06B6B51F, 0x9FBFE4A5, 0xE8B8D433,
+    0x7807C9A2, 0x0F00F934, 0x9609A88E, 0xE10E9818,
+    0x7F6A0DBB, 0x086D3D2D, 0x91646C97, 0xE6635C01,
+    0x6B6B51F4, 0x1C6C6162, 0x856530D8, 0xF262004E,
+    0x6C0695ED, 0x1B01A57B, 0x8208F4C1, 0xF50FC457,
+    0x65B0D9C6, 0x12B7E950, 0x8BBEB8EA, 0xFCB9887C,
+    0x62DD1DDF, 0x15DA2D49, 0x8CD37CF3, 0xFBD44C65,
+    0x4DB26158, 0x3AB551CE, 0xA3BC0074, 0xD4BB30E2,
+    0x4ADFA541, 0x3DD895D7, 0xA4D1C46D, 0xD3D6F4FB,
+    0x4369E96A, 0x346ED9FC, 0xAD678846, 0xDA60B8D0,
+    0x44042D73, 0x33031DE5, 0xAA0A4C5F, 0xDD0D7CC9,
+    0x5005713C, 0x270241AA, 0xBE0B1010, 0xC90C2086,
+    0x5768B525, 0x206F85B3, 0xB966D409, 0xCE61E49F,
+    0x5EDEF90E, 0x29D9C998, 0xB0D09822, 0xC7D7A8B4,
+    0x59B33D17, 0x2EB40D81, 0xB7BD5C3B, 0xC0BA6CAD,
+    0xEDB88320, 0x9ABFB3B6, 0x03B6E20C, 0x74B1D29A,
+    0xEAD54739, 0x9DD277AF, 0x04DB2615, 0x73DC1683,
+    0xE3630B12, 0x94643B84, 0x0D6D6A3E, 0x7A6A5AA8,
+    0xE40ECF0B, 0x9309FF9D, 0x0A00AE27, 0x7D079EB1,
+    0xF00F9344, 0x8708A3D2, 0x1E01F268, 0x6906C2FE,
+    0xF762575D, 0x806567CB, 0x196C3671, 0x6E6B06E7,
+    0xFED41B76, 0x89D32BE0, 0x10DA7A5A, 0x67DD4ACC,
+    0xF9B9DF6F, 0x8EBEEFF9, 0x17B7BE43, 0x60B08ED5,
+    0xD6D6A3E8, 0xA1D1937E, 0x38D8C2C4, 0x4FDFF252,
+    0xD1BB67F1, 0xA6BC5767, 0x3FB506DD, 0x48B2364B,
+    0xD80D2BDA, 0xAF0A1B4C, 0x36034AF6, 0x41047A60,
+    0xDF60EFC3, 0xA867DF55, 0x316E8EEF, 0x4669BE79,
+    0xCB61B38C, 0xBC66831A, 0x256FD2A0, 0x5268E236,
+    0xCC0C7795, 0xBB0B4703, 0x220216B9, 0x5505262F,
+    0xC5BA3BBE, 0xB2BD0B28, 0x2BB45A92, 0x5CB36A04,
+    0xC2D7FFA7, 0xB5D0CF31, 0x2CD99E8B, 0x5BDEAE1D,
+    0x9B64C2B0, 0xEC63F226, 0x756AA39C, 0x026D930A,
+    0x9C0906A9, 0xEB0E363F, 0x72076785, 0x05005713,
+    0x95BF4A82, 0xE2B87A14, 0x7BB12BAE, 0x0CB61B38,
+    0x92D28E9B, 0xE5D5BE0D, 0x7CDCEFB7, 0x0BDBDF21,
+    0x86D3D2D4, 0xF1D4E242, 0x68DDB3F8, 0x1FDA836E,
+    0x81BE16CD, 0xF6B9265B, 0x6FB077E1, 0x18B74777,
+    0x88085AE6, 0xFF0F6A70, 0x66063BCA, 0x11010B5C,
+    0x8F659EFF, 0xF862AE69, 0x616BFFD3, 0x166CCF45,
+    0xA00AE278, 0xD70DD2EE, 0x4E048354, 0x3903B3C2,
+    0xA7672661, 0xD06016F7, 0x4969474D, 0x3E6E77DB,
+    0xAED16A4A, 0xD9D65ADC, 0x40DF0B66, 0x37D83BF0,
+    0xA9BCAE53, 0xDEBB9EC5, 0x47B2CF7F, 0x30B5FFE9,
+    0xBDBDF21C, 0xCABAC28A, 0x53B39330, 0x24B4A3A6,
+    0xBAD03605, 0xCDD70693, 0x54DE5729, 0x23D967BF,
+    0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94,
+    0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D
+};
+
+//tabela de substituição função gera_mascara2
+const char tabela_base32[] = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+
+// Função de processamento
+char* process_serial(uint8_t* buffer, const char* serial) {
+    uint8_t i;
+    const char* ecx = serial;
+    uint8_t* dst = buffer;
+
+    // Copia byte a byte
+    do {
+        i = *ecx;
+        *dst = i;
+        ecx++;
+        dst++;
+    } while (i != 0);
+
+    uint8_t idx;
+    uint8_t tmp;
+
+    idx = data_428cc8[0];
+    i = buffer[idx];
+    tmp = buffer[0x0D];
+    buffer[idx] = tmp;
+    buffer[0x0D] = i;
+
+    idx = data_428cc8[1];
+    i = buffer[idx];
+    tmp = buffer[0x0E];
+    buffer[idx] = tmp;
+    buffer[0x0E] = i;
+
+    idx = data_428cc8[2];
+    i = buffer[idx];
+    tmp = buffer[0x0F];
+    buffer[idx] = tmp;
+    buffer[0x0F] = i;
+
+    idx = data_428cc8[3];
+    i = buffer[idx];
+    tmp = buffer[0x10];
+    buffer[idx] = tmp;
+    buffer[0x10] = i;
+
+    idx = data_428cc8[4];
+    i = buffer[idx];
+    tmp = buffer[0x11];
+    buffer[idx] = tmp;
+    buffer[0x11] = i;
+
+    idx = data_428cc8[5];
+    i = buffer[idx];
+    tmp = buffer[0x12];
+    buffer[idx] = tmp;
+    buffer[0x12] = i;
+
+    idx = data_428cc8[6];
+    i = buffer[idx];
+    tmp = buffer[0x13];
+    buffer[idx] = tmp;
+    buffer[0x13] = i;
+
+    buffer[0x14] = 0;
+
+    return (char*)buffer;
+}
+
+uint32_t gera_hash1(const uint8_t* buffer, int32_t length) {
+    uint32_t ecx = 1;  // equivalente ao acumulador A no Adler-32
+    uint32_t edi = 0;  // acumulador B
+
+    for (int i = 0; i < length; i++) {
+        ecx = (buffer[i] + ecx) % 0xFFF1;
+        edi = (edi + ecx) % 0xFFF1;
+    }
+
+    return (edi << 16) | ecx;
+}
+
+uint32_t gera_xor1(uint32_t valor_hash, uint32_t chave) {
+        return valor_hash ^ chave;
+}
+
+void gera_mascara1(uint8_t* buffer, uint32_t valor) {
+    const char* tabela = "64382957JKLMNPQRSTUVWXYZABCDEFGH";
+
+    // Extrai os blocos de 5 bits e coloca nos índices especificados
+    buffer[6] = valor & 0x1F;
+    buffer[5] = (valor >> 5) & 0x1F;
+    buffer[4] = (valor >> 10) & 0x1F;
+    buffer[3] = (valor >> 15) & 0x1F;
+    buffer[2] = (valor >> 20) & 0x1F;
+    buffer[1] = (valor >> 25) & 0x1F;
+    buffer[0] = (valor >> 30) & 0x03; // apenas 2 bits no topo
+
+    // Combina bits: buffer[0] |= (buffer[6] & 0x07) << 2;
+    buffer[0] |= (buffer[6] & 0x07) << 2;
+
+    // Substituição de cada valor pelos caracteres da tabela
+    uint8_t temp0 = buffer[0];
+    uint8_t temp1 = buffer[1];
+    uint8_t temp2 = buffer[2];
+    uint8_t temp3 = buffer[3];
+    uint8_t temp4 = buffer[4];
+    uint8_t temp5 = buffer[5];
+    uint8_t temp6 = buffer[6];
+
+    buffer[0] = tabela[temp0];
+    buffer[1] = tabela[temp1];
+    buffer[2] = tabela[temp2];
+    buffer[3] = tabela[temp3];
+    buffer[4] = tabela[temp4];
+    buffer[5] = tabela[temp5];
+    buffer[6] = tabela[temp6];
+
+    buffer[7] = '\0'; // terminador de string
+}
+// Função principal
+void concatena1(char* destino, const char* buffer13, const char* mascara7) {
+    // Copia os 13 primeiros caracteres do buffer processado
+    memcpy(destino, buffer13, 13);
+
+    // Copia os 7 caracteres da máscara
+    memcpy(destino + 13, mascara7, 7);
+
+    // Garante terminação nula
+    destino[20] = '\0';
+}
+
+uint32_t gera_hash2OLD(const char* entrada, int32_t tamanho, uint32_t chave_inicial) {
+    uint32_t resultado = chave_inicial;
+
+    for (int i = 0; i < tamanho; i++) {
+        uint8_t index = ((uint8_t)entrada[i]) ^ (resultado & 0xFF);
+        printf("Indice:%i Valor:%i \n", index, data_42a9a8[index]);
+        resultado = (resultado >> 8) ^ data_42a9a8[index];
+    }
+
+    return resultado;
+}
+
+uint32_t gera_hash2(const char* entrada, int32_t tamanho, uint32_t chave_inicial) {
+    uint32_t resultado = chave_inicial;
+    for (int i = 0; i < tamanho; i++) {
+        uint32_t index = 0;
+        index = ((uint8_t)entrada[i]) ^ resultado;
+        //printf("[1]%08x /", index);
+        index = index & 0xff;
+        //printf("[2]%08x /", index);
+        index = data_42a9a8[index];
+        //printf("[3]%08x \n", index);
+        resultado = (resultado >> 8);
+        resultado = resultado ^ index;
+    }
+
+    return resultado;
+}
+
+uint8_t* gera_mascara2(uint8_t* buffer, uint32_t valor_hash) {
+    buffer[6] = (valor_hash & 0x3) << 3;
+
+    uint32_t tmp = valor_hash >> 2;
+    buffer[5] = tmp & 0x1F;
+    buffer[4] = (tmp >> 5) & 0x1F;
+    buffer[3] = (tmp >> 10) & 0x1F;
+    buffer[2] = (tmp >> 15) & 0x1F;
+    buffer[1] = (tmp >> 20) & 0x1F;
+    uint8_t parte_final = (tmp >> 25) & 0x1F;
+    buffer[0] = parte_final;
+
+    // Completa os 3 bits finais do byte 6 com os 3 bits inferiores de parte_final
+    buffer[6] |= parte_final & 0x07;
+
+    // Substituição por caracteres da tabela base32
+    buffer[0] = tabela_base32[buffer[0]];
+    buffer[1] = tabela_base32[buffer[1]];
+    buffer[2] = tabela_base32[buffer[2]];
+    buffer[3] = tabela_base32[buffer[3]];
+    buffer[4] = tabela_base32[buffer[4]];
+    buffer[5] = tabela_base32[buffer[5]];
+    buffer[6] = tabela_base32[buffer[6]];
+
+    // Finaliza com null-terminator para string C
+    buffer[7] = '\0';
+
+    return buffer;
+}
+
+void* process_serial2(char* arg1, const char* arg2) {
+    // Copia todo o conteúdo de arg2 para arg1 (inclusive o terminador nulo)
+    strcpy(arg1, arg2);
+
+    // Troca de bytes conforme a tabela data_428cc8
+    uint8_t tmp, ebx;
+    int offset;
+
+    // [0] arg1[data_428cc8[0]] <-> arg1[0x0D]
+    offset = data_428cc8[0];
+    tmp = arg1[offset];
+    ebx = arg1[0x0D];
+    arg1[offset] = ebx;
+    arg1[0x0D] = tmp;
+
+    // [1] arg1[data_428cc8[1]] <-> arg1[0x0E]
+    offset = data_428cc8[1];
+    tmp = arg1[offset];
+    ebx = arg1[0x0E];
+    arg1[offset] = ebx;
+    arg1[0x0E] = tmp;
+
+    // [2] arg1[data_428cc8[2]] <-> arg1[0x0F]
+    offset = data_428cc8[2];
+    tmp = arg1[offset];
+    ebx = arg1[0x0F];
+    arg1[offset] = ebx;
+    arg1[0x0F] = tmp;
+
+    // [3] arg1[data_428cc8[3]] <-> arg1[0x10]
+    offset = data_428cc8[3];
+    tmp = arg1[offset];
+    ebx = arg1[0x10];
+    arg1[offset] = ebx;
+    arg1[0x10] = tmp;
+
+    // [4] arg1[data_428cc8[4]] <-> arg1[0x11]
+    offset = data_428cc8[4];
+    tmp = arg1[offset];
+    ebx = arg1[0x11];
+    arg1[offset] = ebx;
+    arg1[0x11] = tmp;
+
+    // [5] arg1[data_428cc8[5]] <-> arg1[0x12]
+    offset = data_428cc8[5];
+    tmp = arg1[offset];
+    ebx = arg1[0x12];
+    arg1[offset] = ebx;
+    arg1[0x12] = tmp;
+
+    // [6] arg1[data_428cc8[6]] <-> arg1[0x13]
+    offset = data_428cc8[6];
+    tmp = arg1[offset];
+    ebx = arg1[0x13];
+    arg1[offset] = ebx;
+    arg1[0x13] = tmp;
+
+    // Finaliza a string
+    arg1[0x14] = 0;
+
+    return arg1;
+}
+
+int main() {
+    //const char* input_serial = "ABCDEFGHIJ1234567890"; // 20 caracteres
+    const char* input_serial = "622A3TLBXQARPUKTM2RD"; // 20 caracteres
+    uint8_t buffer[32] = {0}; // buffer com espaço extra
+
+    LARGE_INTEGER frequency, inicio, fim;
+    QueryPerformanceFrequency(&frequency); // Obtém a frequência do contador
+    QueryPerformanceCounter(&inicio); // Marca o início
+
+
+    //PROCESSA SERIAL
+    process_serial(buffer, input_serial);
+
+    printf("[1]Buffer apos process_serial: ");
+    for (int i = 0; i < 21; i++) { // 20 + null terminator
+        printf("%c", buffer[i] ? buffer[i] : '.');
+    }
+    printf("\n");
+
+    //GERA HASH1
+    uint32_t hash = gera_hash1(buffer, 13);
+    printf("[2]Hash gerado: %08X\n", hash);
+
+    //GERA XOR1
+    uint32_t xor1 = gera_xor1(hash, 0x1D530);
+
+    printf("[3]Valor apos XOR1: %08X\n", xor1);
+
+
+    //GERA MASCARA1
+    char codigo[8] = {0};
+    gera_mascara1(codigo, xor1);
+
+    printf("[4]Valor mascara: %s\n", codigo);
+
+    //CONCATENA SERIAL13 COM XOR
+    char serial_mais_xor[21];
+    concatena1(serial_mais_xor, buffer, codigo);
+
+    printf("[5]Serial concat xor:%s\n",serial_mais_xor);
+
+
+    //GERA HASH2
+    uint32_t resultado_hash2 = gera_hash2(serial_mais_xor, 0X14, 0X1D530);
+
+    printf("[6]Resultado gera hash2:%08X\n",resultado_hash2);
+
+    //GERA MASCARA 2
+    uint8_t buffer_mascara[8];  // 7 + null terminator
+    gera_mascara2(buffer_mascara, resultado_hash2);
+    printf("[7]Pos gera mascara 2: %s\n", buffer_mascara);
+
+    //CONCATENA
+    char serial_mais_mascara[21];
+    concatena1(serial_mais_mascara, buffer, buffer_mascara);
+    printf("[8]Serial_mod concat mascara2:%s\n",serial_mais_mascara);
+
+    //MODIFICA SERIAL 2
+    char buffer_final[32];  // Deve ter espaço suficiente para o serial + máscara + modificações
+    process_serial2(buffer_final, serial_mais_mascara);
+    printf("[9]Serial_final pos-processamento: %s\n\n\n", buffer_final);
+
+    // COMPARAÇÃO
+    printf("Serial de entrada:         %s\n", input_serial);
+    printf("Serial após processamento: %s\n", buffer_final);
+
+    if (strncmp(input_serial, buffer_final, 16) == 0) {
+        printf("[OK] Serial VALIDO.\n");
+    } else {
+        printf("[ERRO] Serial INVALIDO.\n");
+    }
+
+    QueryPerformanceCounter(&fim); // Marca o fim
+    double tempo_execucao = (double)(fim.QuadPart - inicio.QuadPart) / frequency.QuadPart; // Tempo em segundos
+
+
+    printf("\nTempo de execução: %f segundos\n", tempo_execucao);
+    getchar();
+    return 0;
+}
